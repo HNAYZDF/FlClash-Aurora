@@ -185,18 +185,24 @@ class ApplicationState extends ConsumerState<Application> {
           locale: getLocaleForString(locale),
           supportedLocales: AppLocalizations.delegate.supportedLocales,
           themeMode: themeProps.themeMode,
-          theme: ThemeData(
-            useMaterial3: true,
-            pageTransitionsTheme: _pageTransitionsTheme,
-            actionIconTheme: _actionIconTheme,
-            colorScheme: _getAppColorScheme(brightness: Brightness.light),
-          ).withAppShapes,
-          darkTheme: ThemeData(
-            useMaterial3: true,
-            pageTransitionsTheme: _pageTransitionsTheme,
-            actionIconTheme: _actionIconTheme,
-            colorScheme: _getAppColorScheme(brightness: Brightness.dark),
-          ).withAppShapes,
+          theme:
+              ThemeData(
+                useMaterial3: true,
+                pageTransitionsTheme: _pageTransitionsTheme,
+                actionIconTheme: _actionIconTheme,
+                colorScheme: _getAppColorScheme(brightness: Brightness.light),
+              ).withAppShapes.withAurora(
+                windowTransparency: themeProps.windowTransparency,
+              ),
+          darkTheme:
+              ThemeData(
+                useMaterial3: true,
+                pageTransitionsTheme: _pageTransitionsTheme,
+                actionIconTheme: _actionIconTheme,
+                colorScheme: _getAppColorScheme(brightness: Brightness.dark),
+              ).withAppShapes.withAurora(
+                windowTransparency: themeProps.windowTransparency,
+              ),
           home: KeyboardInsetHold(child: child!),
         );
       },

@@ -59,6 +59,7 @@ class _LineChartState extends State<LineChart> {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return RepaintBoundary(
       child: SizedBox.expand(
         child: CustomPaint(
@@ -67,6 +68,8 @@ class _LineChartState extends State<LineChart> {
             capacity: widget.capacity,
             minScale: widget.minScale,
             color: widget.color,
+            glow: AuroraTheme.of(context).glow,
+            baselineColor: scheme.outlineVariant,
           ),
         ),
       ),
@@ -139,14 +142,11 @@ class _LineChartPainter extends CustomPainter {
     required this.capacity,
     required this.minScale,
     required this.color,
-  }) : _strokePaint = Paint()
-         ..color = color
-         ..strokeWidth = _strokeWidth
-         ..strokeCap = StrokeCap.round
-         ..strokeJoin = StrokeJoin.round
-         ..style = PaintingStyle.stroke;
+    required this.glow,
+    required this.baselineColor,
+  });
 
-  static const _strokeWidth = 2.0;
+  static const _strokeWidth = 2.4;
 
   /// Keeps the zero line clear of the card's rounded bottom corners.
   static const _baselineRatio = 0.7;
@@ -156,7 +156,10 @@ class _LineChartPainter extends CustomPainter {
   final double minScale;
   final Color color;
 
-  final Paint _strokePaint;
+  /// Halo drawn under the curve, so the trace reads as lit rather than painted.
+  final Color glow;
+
+  final Color baselineColor;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -195,18 +198,95 @@ class _LineChartPainter extends CustomPainter {
       ..lineTo(x, size.height)
       ..lineTo(firstX, size.height)
       ..close();
-    final fillPaint = Paint()
-      ..shader = LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: [color.opacity38, color.opacity10],
-      ).createShader(Offset.zero & size);
+    final bounds = Offset.zero & size;
+
     canvas
       ..save()
-      ..clipRect(Offset.zero & size)
-      ..drawPath(area, fillPaint)
-      ..drawPath(line, _strokePaint)
-      ..restore();
+      ..clipRect(bounds)
+      // A hairline at zero, so the wash has a floor to sit on.
+      ..drawLine(
+        Offset(0, baseline),
+        Offset(size.width, baseline),
+        Paint()
+          ..color = baselineColor.withValues(alpha: 0.5)
+          ..strokeWidth = 1,
+      )
+      // Depth wash under the curve.
+      ..drawPath(
+        area,
+        Paint()
+          ..shader = LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              color.withValues(alpha: 0.38),
+              color.withValues(alpha: 0.12),
+              color.withValues(alpha: 0.01),
+            ],
+            stops: const [0.0, 0.55, 1.0],
+          ).createShader(bounds),
+      )
+      // Wide halo, then a tighter one: stacked this way they read as a single
+      // soft neon bloom instead of a hard outline.
+      ..drawPath(
+        line,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = _strokeWidth * 5
+          ..strokeCap = StrokeCap.round
+          ..strokeJoin = StrokeJoin.round
+          ..color = glow.withValues(alpha: 0.20)
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 7),
+      )
+      ..drawPath(
+        line,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = _strokeWidth * 2.2
+          ..strokeCap = StrokeCap.round
+          ..strokeJoin = StrokeJoin.round
+          ..color = glow.withValues(alpha: 0.38)
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2.5),
+      )
+      // Crisp trace, brightening towards the live edge.
+      ..drawPath(
+        line,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = _strokeWidth
+          ..strokeCap = StrokeCap.round
+          ..strokeJoin = StrokeJoin.round
+          ..shader = LinearGradient(
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+            colors: [color.withValues(alpha: 0.55), color, color.lighten(18)],
+            stops: const [0.0, 0.75, 1.0],
+          ).createShader(bounds),
+      );
+
+    // Pulsing head marker at the newest sample.
+    final head = Offset(x, baseline - heights.last * yScale);
+    if (head.dy.isFinite && head.dx.isFinite) {
+      canvas
+        ..drawCircle(
+          head,
+          _strokeWidth * 3.4,
+          Paint()
+            ..color = glow.withValues(alpha: 0.45)
+            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 5),
+        )
+        ..drawCircle(
+          head,
+          _strokeWidth * 1.5,
+          Paint()..color = color.lighten(20),
+        )
+        ..drawCircle(
+          head,
+          _strokeWidth * 0.7,
+          Paint()..color = const Color(0xFFFFFFFF).withValues(alpha: 0.9),
+        );
+    }
+    canvas.restore();
   }
 
   @override
@@ -214,6 +294,8 @@ class _LineChartPainter extends CustomPainter {
     return oldDelegate.series != series ||
         oldDelegate.capacity != capacity ||
         oldDelegate.minScale != minScale ||
-        oldDelegate.color != color;
+        oldDelegate.color != color ||
+        oldDelegate.glow != glow ||
+        oldDelegate.baselineColor != baselineColor;
   }
 }

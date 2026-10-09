@@ -6447,6 +6447,61 @@ class AppLocalizations {
       args: [],
     );
   }
+
+  /// `Skins`
+  String get skins {
+    return Intl.message('Skins', name: 'skins', desc: '', args: []);
+  }
+
+  /// `Beautification`
+  String get beautification {
+    return Intl.message(
+      'Beautification',
+      name: 'beautification',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Skins, motion and app icon`
+  String get beautificationDesc {
+    return Intl.message(
+      'Skins, motion and app icon',
+      name: 'beautificationDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Bilibili`
+  String get beautificationLink {
+    return Intl.message(
+      'Bilibili',
+      name: 'beautificationLink',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Custom build · upstream updates are off so the theme is not replaced`
+  String get customBuildNotice {
+    return Intl.message(
+      'Custom build · upstream updates are off so the theme is not replaced',
+      name: 'customBuildNotice',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Window transparency`
+  String get windowTransparency {
+    return Intl.message(
+      'Window transparency',
+      name: 'windowTransparency',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {

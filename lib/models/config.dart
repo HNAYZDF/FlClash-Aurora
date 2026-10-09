@@ -322,6 +322,7 @@ abstract class ThemeProps with _$ThemeProps {
     @Default(DynamicSchemeVariant.content) DynamicSchemeVariant schemeVariant,
     @Default(false) bool pureBlack,
     @Default(true) bool sidebarBlur,
+    @Default(defaultWindowTransparency) double windowTransparency,
     @Default(TextScale()) TextScale textScale,
   }) = _ThemeProps;
 

@@ -125,7 +125,12 @@ List<String> createFlutterBuildArgs({
 }
 
 Map<String, String> createBuildEnvironment(String env) {
-  return {'APP_ENV': env};
+  return {
+    'APP_ENV': env,
+    // The window runs a frosted-glass effect, so the app surface is translucent
+    // and the sidebar may tint over the desktop behind it.
+    'FEATURE_SIDEBAR_BLUR': 'true',
+  };
 }
 
 /// Packages whose build hook `pubspec.yaml` turns into a no-op.
@@ -214,11 +219,14 @@ Future<int> _package(
     runInShell: Platform.isWindows,
   );
 
+  // Windows tooling (Inno Setup, archive helpers) reports diagnostics in the
+  // console code page, not UTF-8. Decoding strictly would throw here and hide
+  // the real failure, so malformed bytes are passed through instead.
   process.stdout.listen((data) {
-    stdout.write(utf8.decode(data));
+    stdout.write(utf8.decode(data, allowMalformed: true));
   });
   process.stderr.listen((data) {
-    stderr.write(utf8.decode(data));
+    stderr.write(utf8.decode(data, allowMalformed: true));
   });
   final exitCode = await process.exitCode;
   return exitCode;

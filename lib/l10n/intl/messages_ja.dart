@@ -242,6 +242,11 @@ class MessageLookup extends MessageLookupByLibrary {
     "batteryOptimizationStatusTip": MessageLookupByLibrary.simpleMessage(
       "システムの制限により、実行中は電池の最適化の状態を正しく取得できません",
     ),
+    "beautification": MessageLookupByLibrary.simpleMessage("デザイン"),
+    "beautificationDesc": MessageLookupByLibrary.simpleMessage(
+      "スキン、モーション、アイコン",
+    ),
+    "beautificationLink": MessageLookupByLibrary.simpleMessage("Bilibili"),
     "behavior": MessageLookupByLibrary.simpleMessage("動作"),
     "bind": MessageLookupByLibrary.simpleMessage("連携"),
     "blacklistMode": MessageLookupByLibrary.simpleMessage("ブラックリストモード"),
@@ -344,6 +349,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "createProfileFromUrlTip": m3,
     "creationTime": MessageLookupByLibrary.simpleMessage("作成日時"),
     "custom": MessageLookupByLibrary.simpleMessage("カスタム"),
+    "customBuildNotice": MessageLookupByLibrary.simpleMessage(
+      "カスタムビルド · 上流の更新チェックは無効です",
+    ),
     "customProxiesEmpty": MessageLookupByLibrary.simpleMessage(
       "カスタムプロキシがないため、プロファイル自身のプロキシを使用します",
     ),
@@ -1170,6 +1178,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "singleAdd": MessageLookupByLibrary.simpleMessage("個別追加"),
     "singleValueTip": m51,
     "size": MessageLookupByLibrary.simpleMessage("サイズ"),
+    "skins": MessageLookupByLibrary.simpleMessage("スキン"),
     "slide": MessageLookupByLibrary.simpleMessage("スライド"),
     "socksPort": MessageLookupByLibrary.simpleMessage("SOCKSポート"),
     "sort": MessageLookupByLibrary.simpleMessage("並べ替え"),
@@ -1269,6 +1278,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "vpnTip": MessageLookupByLibrary.simpleMessage("変更はVPNの再起動後に有効になります"),
     "webDAVConfiguration": MessageLookupByLibrary.simpleMessage("WebDAV設定"),
     "whitelistMode": MessageLookupByLibrary.simpleMessage("ホワイトリストモード"),
+    "windowTransparency": MessageLookupByLibrary.simpleMessage("ウィンドウの透明度"),
     "writeToSystem": MessageLookupByLibrary.simpleMessage("システムに書き込む"),
     "writeToSystemDesc": MessageLookupByLibrary.simpleMessage(
       "システムクロックも設定します。Androidでは無視されます",

@@ -290,11 +290,16 @@ class BreathingFill extends StatefulWidget {
 
 class _BreathingFillState extends State<BreathingFill> {
   static const _breathDuration = Duration(milliseconds: 1400);
+  static const _ringDuration = Duration(milliseconds: 2600);
   // A ticker would redraw the screen on every vsync for as long as the core runs.
   static const _breathStep = Duration(milliseconds: 66);
   static const _fadeDuration = Duration(milliseconds: 300);
 
   final _breath = ValueNotifier<double>(0);
+
+  /// Monotonic 0..1 sawtooth, so the ripple rings can travel outwards without
+  /// reversing the way the breath value does.
+  final _wave = ValueNotifier<double>(0);
   late final AppLifecycleListener _lifecycle;
   Timer? _timer;
   int _steps = 0;
@@ -338,8 +343,11 @@ class _BreathingFillState extends State<BreathingFill> {
 
   void _step() {
     final period = _breathDuration.inMicroseconds / _breathStep.inMicroseconds;
-    final phase = ++_steps % (2 * period) / period;
+    final step = ++_steps;
+    final phase = step % (2 * period) / period;
     _breath.value = Curves.easeInOut.transform(phase <= 1 ? phase : 2 - phase);
+    final ring = _ringDuration.inMicroseconds / _breathStep.inMicroseconds;
+    _wave.value = (step % ring) / ring;
   }
 
   @override
@@ -347,6 +355,7 @@ class _BreathingFillState extends State<BreathingFill> {
     _timer?.cancel();
     _lifecycle.dispose();
     _breath.dispose();
+    _wave.dispose();
     super.dispose();
   }
 
@@ -365,6 +374,7 @@ class _BreathingFillState extends State<BreathingFill> {
                 child: CustomPaint(
                   painter: _BreathingFillPainter(
                     breath: _breath,
+                    wave: _wave,
                     color: theme.colorScheme.onPrimaryContainer,
                     shape:
                         theme.floatingActionButtonTheme.shape ?? AppShape.full,
@@ -382,20 +392,44 @@ class _BreathingFillState extends State<BreathingFill> {
 class _BreathingFillPainter extends CustomPainter {
   _BreathingFillPainter({
     required this.breath,
+    required this.wave,
     required this.color,
     required this.shape,
-  }) : super(repaint: breath);
+  }) : super(repaint: Listenable.merge([breath, wave]));
 
   final ValueNotifier<double> breath;
+  final ValueNotifier<double> wave;
   final Color color;
   final ShapeBorder shape;
 
   @override
   void paint(Canvas canvas, Size size) {
+    final path = shape.getOuterPath(Offset.zero & size);
     canvas.drawPath(
-      shape.getOuterPath(Offset.zero & size),
+      path,
       Paint()..color = color.withValues(alpha: 0.14 * breath.value),
     );
+
+    // Rings ripple out from the glyph, so a running core reads as alive. The
+    // origin is the button's leading icon: for the round dock button that is
+    // the centre, and for the pill it is where the glyph sits.
+    canvas
+      ..save()
+      ..clipPath(path);
+    final origin = Offset(size.height / 2, size.height / 2);
+    final reach = size.longestSide;
+    for (var i = 0; i < 3; i++) {
+      final t = (wave.value + i / 3) % 1;
+      canvas.drawCircle(
+        origin,
+        reach * 0.10 + reach * 0.80 * t,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.6
+          ..color = color.withValues(alpha: (1 - t) * 0.36),
+      );
+    }
+    canvas.restore();
   }
 
   @override

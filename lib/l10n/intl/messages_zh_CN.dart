@@ -231,6 +231,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "batteryOptimizationStatusTip": MessageLookupByLibrary.simpleMessage(
       "由于系统限制，运行状态下无法正确获取电池优化状态",
     ),
+    "beautification": MessageLookupByLibrary.simpleMessage("界面美化"),
+    "beautificationDesc": MessageLookupByLibrary.simpleMessage("皮肤、动效与应用图标"),
+    "beautificationLink": MessageLookupByLibrary.simpleMessage("哔哩哔哩"),
     "behavior": MessageLookupByLibrary.simpleMessage("行为"),
     "bind": MessageLookupByLibrary.simpleMessage("绑定"),
     "blacklistMode": MessageLookupByLibrary.simpleMessage("黑名单模式"),
@@ -315,6 +318,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "createProfileFromUrlTip": m3,
     "creationTime": MessageLookupByLibrary.simpleMessage("创建时间"),
     "custom": MessageLookupByLibrary.simpleMessage("自定义"),
+    "customBuildNotice": MessageLookupByLibrary.simpleMessage(
+      "定制构建 · 已关闭上游更新检查，以免覆盖界面美化",
+    ),
     "customProxiesEmpty": MessageLookupByLibrary.simpleMessage(
       "未添加自定义代理，沿用配置文件自身的代理",
     ),
@@ -1039,6 +1045,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "singleAdd": MessageLookupByLibrary.simpleMessage("单条添加"),
     "singleValueTip": m51,
     "size": MessageLookupByLibrary.simpleMessage("尺寸"),
+    "skins": MessageLookupByLibrary.simpleMessage("皮肤"),
     "slide": MessageLookupByLibrary.simpleMessage("滑动"),
     "socksPort": MessageLookupByLibrary.simpleMessage("Socks端口"),
     "sort": MessageLookupByLibrary.simpleMessage("排序"),
@@ -1134,6 +1141,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "vpnTip": MessageLookupByLibrary.simpleMessage("重启VPN后改变生效"),
     "webDAVConfiguration": MessageLookupByLibrary.simpleMessage("WebDAV配置"),
     "whitelistMode": MessageLookupByLibrary.simpleMessage("白名单模式"),
+    "windowTransparency": MessageLookupByLibrary.simpleMessage("窗口透明度"),
     "writeToSystem": MessageLookupByLibrary.simpleMessage("写入系统"),
     "writeToSystemDesc": MessageLookupByLibrary.simpleMessage(
       "同时设置系统时钟，Android上不生效",

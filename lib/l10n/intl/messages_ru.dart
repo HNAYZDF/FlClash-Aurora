@@ -304,6 +304,11 @@ class MessageLookup extends MessageLookupByLibrary {
     "batteryOptimizationStatusTip": MessageLookupByLibrary.simpleMessage(
       "Из-за системных ограничений во время работы невозможно корректно получить статус оптимизации батареи",
     ),
+    "beautification": MessageLookupByLibrary.simpleMessage("Оформление"),
+    "beautificationDesc": MessageLookupByLibrary.simpleMessage(
+      "Темы, анимация и значок",
+    ),
+    "beautificationLink": MessageLookupByLibrary.simpleMessage("Bilibili"),
     "behavior": MessageLookupByLibrary.simpleMessage("Поведение"),
     "bind": MessageLookupByLibrary.simpleMessage("Привязать"),
     "blacklistMode": MessageLookupByLibrary.simpleMessage(
@@ -430,6 +435,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "createProfileFromUrlTip": m3,
     "creationTime": MessageLookupByLibrary.simpleMessage("Время создания"),
     "custom": MessageLookupByLibrary.simpleMessage("Вручную"),
+    "customBuildNotice": MessageLookupByLibrary.simpleMessage(
+      "Сборка с оформлением · проверка обновлений отключена",
+    ),
     "customProxiesEmpty": MessageLookupByLibrary.simpleMessage(
       "Пользовательских прокси нет, поэтому используются прокси самого профиля",
     ),
@@ -755,9 +763,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "inputRuleContent": MessageLookupByLibrary.simpleMessage(
       "Введите содержимое правила",
     ),
-    "installedAppsPermissionDeniedMessage": MessageLookupByLibrary.simpleMessage(
-      "Разрешение на список приложений отклонено, поэтому установленные приложения недоступны. Предоставьте его вручную в системных настройках.",
-    ),
+    "installedAppsPermissionDeniedMessage":
+        MessageLookupByLibrary.simpleMessage(
+          "Разрешение на список приложений отклонено, поэтому установленные приложения недоступны. Предоставьте его вручную в системных настройках.",
+        ),
     "installedAppsPermissionDesc": MessageLookupByLibrary.simpleMessage(
       "Эта система не выдаёт список установленных приложений без разрешения. Предоставьте его, чтобы настроить прокси для отдельных приложений.",
     ),
@@ -1447,6 +1456,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "singleAdd": MessageLookupByLibrary.simpleMessage("По одному"),
     "singleValueTip": m51,
     "size": MessageLookupByLibrary.simpleMessage("Размер"),
+    "skins": MessageLookupByLibrary.simpleMessage("Скины"),
     "slide": MessageLookupByLibrary.simpleMessage("Сдвиг"),
     "socksPort": MessageLookupByLibrary.simpleMessage("Порт SOCKS"),
     "sort": MessageLookupByLibrary.simpleMessage("Сортировка"),
@@ -1579,6 +1589,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "whitelistMode": MessageLookupByLibrary.simpleMessage(
       "Режим белого списка",
+    ),
+    "windowTransparency": MessageLookupByLibrary.simpleMessage(
+      "Прозрачность окна",
     ),
     "writeToSystem": MessageLookupByLibrary.simpleMessage(
       "Записывать в систему",

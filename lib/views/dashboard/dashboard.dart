@@ -13,6 +13,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'widget_metrics.dart';
 import 'widget_registry.dart';
 import 'widgets/core_status_button.dart';
+import 'widgets/skin_switcher.dart';
 import 'widgets/start_button.dart';
 
 typedef _IsEditWidgetBuilder = Widget Function(bool isEdit);
@@ -197,68 +198,88 @@ class _DashboardViewState extends ConsumerState<DashboardView>
         title: context.appLocalizations.dashboard,
         actions: _buildActions(isEdit),
         floatingActionButton: hasProfile ? const StartButton() : null,
-        body: Align(
-          alignment: Alignment.topCenter,
-          // SingleChildScrollView snaps a bounce back to its edge whenever a
-          // card's refresh relays it out; a sliver viewport keeps the overscroll.
-          child: ValueListenableBuilder(
-            valueListenable: _addSheetController,
-            builder: (context, sheetHeight, _) {
-              final padding = const EdgeInsets.all(16).copyWith(
-                top: context.contentTopPadding,
-                bottom: 16 + max(BottomInsetScope.of(context), sheetHeight),
-              );
-              return CustomScrollView(
-                slivers: [
-                  SliverPadding(
-                    padding: padding,
-                    sliver: SliverToBoxAdapter(
-                      child: Align(
-                        alignment: Alignment.topCenter,
-                        child: ConstrainedBox(
-                          constraints: BoxConstraints(
-                            maxWidth: dashboardMaxGridWidth,
-                          ),
-                          child: LayoutBuilder(
-                            builder: (_, constraints) {
-                              final band = DashboardGridBand.of(
-                                constraints.maxWidth,
-                              );
-                              final columns = band.columns;
-                              final grid = SuperGrid(
-                                key: key,
-                                editing: isEdit,
-                                crossAxisCount: columns,
-                                crossAxisSpacing: spacing,
-                                mainAxisSpacing: spacing,
-                                onChanged: _saveDashboardWidgets,
-                                revealPadding: padding.copyWith(
-                                  left: 0,
-                                  right: 0,
+        body: Stack(
+          children: [
+            Positioned.fill(
+              child: Align(
+                alignment: Alignment.topCenter,
+                // SingleChildScrollView snaps a bounce back to its edge
+                // whenever a card's refresh relays it out; a sliver viewport
+                // keeps the overscroll.
+                child: ValueListenableBuilder(
+                  valueListenable: _addSheetController,
+                  builder: (context, sheetHeight, _) {
+                    final padding = const EdgeInsets.all(16).copyWith(
+                      top: context.contentTopPadding,
+                      // Deep enough that the cards can always be scrolled clear
+                      // of the cluster pinned to the bottom edge.
+                      bottom:
+                          96 + max(BottomInsetScope.of(context), sheetHeight),
+                    );
+                    return CustomScrollView(
+                      slivers: [
+                        SliverPadding(
+                          padding: padding,
+                          sliver: SliverToBoxAdapter(
+                            child: Align(
+                              alignment: Alignment.topCenter,
+                              child: ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  maxWidth: dashboardMaxGridWidth,
                                 ),
-                                children: children,
-                              );
-                              return DashboardWidgetMetrics(
-                                unitHeight: dashboardUnitHeight(
-                                  constraints.maxWidth,
+                                child: LayoutBuilder(
+                                  builder: (_, constraints) {
+                                    final band = DashboardGridBand.of(
+                                      constraints.maxWidth,
+                                    );
+                                    final columns = band.columns;
+                                    final grid = SuperGrid(
+                                      key: key,
+                                      editing: isEdit,
+                                      crossAxisCount: columns,
+                                      crossAxisSpacing: spacing,
+                                      mainAxisSpacing: spacing,
+                                      onChanged: _saveDashboardWidgets,
+                                      revealPadding: padding.copyWith(
+                                        left: 0,
+                                        right: 0,
+                                      ),
+                                      children: children,
+                                    );
+                                    return DashboardWidgetMetrics(
+                                      unitHeight: dashboardUnitHeight(
+                                        constraints.maxWidth,
+                                      ),
+                                      child: isEdit
+                                          ? BackLayerScope(
+                                              onBack: _handleExitEdit,
+                                              child: grid,
+                                            )
+                                          : grid,
+                                    );
+                                  },
                                 ),
-                                child: isEdit
-                                    ? BackLayerScope(
-                                        onBack: _handleExitEdit,
-                                        child: grid,
-                                      )
-                                    : grid,
-                              );
-                            },
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-                  ),
-                ],
-              );
-            },
-          ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+            ),
+            // Window transparency and the skin picker hang off the bottom
+            // border, level with the start button. They are an overlay so a
+            // short dashboard cannot leave them stranded in the middle of the
+            // empty space; the scroll padding above keeps cards out from under.
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 16 + BottomInsetScope.of(context),
+              child: const Center(child: SkinSwitcher()),
+            ),
+          ],
         ),
       ),
     );

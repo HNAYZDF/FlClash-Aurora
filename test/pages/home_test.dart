@@ -125,20 +125,12 @@ void main() {
       );
       await tester.pump();
 
-      final sidebarBackground = find.descendant(
-        of: find.byType(AppSidebarContainer),
-        matching: find.byWidgetPredicate(
-          (widget) => widget is Container && widget.child is Row,
-        ),
-      );
-      final sidebarContainer = tester.widget<Container>(
-        sidebarBackground.first,
-      );
+      // The window is backed by the ambient aurora, so the shell itself is
+      // transparent and the sidebar's own frosted fill is what tints this
+      // region. Its separating edge is still drawn.
       final colorScheme = Theme.of(
         tester.element(find.byType(AppSidebarContainer)),
       ).colorScheme;
-      expect(sidebarContainer.color, colorScheme.surfaceContainer);
-
       final sidebarEdge = tester.widget<Material>(
         find
             .descendant(
@@ -149,6 +141,10 @@ void main() {
               ),
             )
             .first,
+      );
+      expect(
+        sidebarEdge.color,
+        colorScheme.surfaceContainer.withValues(alpha: 0.70),
       );
       expect(
         (sidebarEdge.shape! as BorderDirectional).end.color,

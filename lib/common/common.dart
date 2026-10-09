@@ -1,5 +1,6 @@
 export 'app_localizations.dart';
 export 'app_ports.dart';
+export 'aurora.dart';
 export 'backup.dart';
 export 'changelog.dart';
 export 'color.dart';
@@ -46,6 +47,7 @@ export 'request.dart';
 export 'scroll.dart';
 export 'search.dart';
 export 'shape.dart';
+export 'skin.dart';
 export 'snowflake.dart';
 export 'string.dart';
 export 'system.dart';

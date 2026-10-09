@@ -175,14 +175,17 @@ void main() {
     testWidgets('follows the system until custom is picked', (tester) async {
       await pumpThemeView(tester);
 
+      // The window-transparency slider leads the page, so the text scale one is
+      // the last slider on it.
+      final slider = find.byType(Slider).last;
       expect(readTheme().textScale.enable, isFalse);
-      expect(tester.widget<Slider>(find.byType(Slider)).onChanged, isNull);
+      expect(tester.widget<Slider>(slider).onChanged, isNull);
 
       await tester.tap(find.text('Custom'));
       await tester.pumpAndSettle();
 
       expect(readTheme().textScale.enable, isTrue);
-      expect(tester.widget<Slider>(find.byType(Slider)).onChanged, isNotNull);
+      expect(tester.widget<Slider>(slider).onChanged, isNotNull);
 
       await tester.tap(find.text('Follow system'));
       await tester.pumpAndSettle();
@@ -196,7 +199,7 @@ void main() {
       await tester.pumpAndSettle();
       final before = readTheme().textScale.scale;
 
-      final slider = find.byType(Slider);
+      final slider = find.byType(Slider).last;
       final gesture = await tester.startGesture(tester.getCenter(slider));
       await gesture.moveBy(const Offset(120, 0));
       await tester.pump();

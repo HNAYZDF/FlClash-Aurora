@@ -159,22 +159,29 @@ class CommonCard extends StatelessWidget {
     return BorderSide(
       color: isSelected
           ? colorScheme.primary
-          : colorScheme.surfaceContainerHighest,
+          : AuroraTheme.of(context).glassBorder,
     );
   }
 
   Color? _buildBackgroundColor(BuildContext context) {
     final colorScheme = context.colorScheme;
+    // Frosted rather than solid, so the ambient backdrop glows through. The
+    // filled type keeps the slightly higher tone it had before.
+    final glassAlpha = AuroraTheme.of(context).glassFill.a;
     if (type == CommonCardType.filled) {
       if (isSelected) {
-        return colorScheme.secondaryContainer.opacity80;
+        return colorScheme.secondaryContainer.withValues(
+          alpha: (glassAlpha + 0.14).clamp(0.0, 1.0),
+        );
       }
-      return colorScheme.surfaceContainerHigh;
+      return colorScheme.surfaceContainerHigh.withValues(
+        alpha: (glassAlpha + 0.08).clamp(0.0, 1.0),
+      );
     }
     if (isSelected) {
-      return colorScheme.secondaryContainer;
+      return colorScheme.secondaryContainer.withValues(alpha: 0.92);
     }
-    return colorScheme.surfaceContainerLow;
+    return colorScheme.surfaceContainerLow.withValues(alpha: glassAlpha);
   }
 
   Color? _buildForegroundColor(BuildContext context) {
@@ -280,6 +287,33 @@ class CommonCard extends StatelessWidget {
       childWidget = Stack(children: children);
     }
 
+    // A whisper of light across the card, so a frosted fill reads as glass
+    // rather than as a flat one. StackFit.passthrough keeps the button's own
+    // constraints untouched.
+    childWidget = Stack(
+      fit: StackFit.passthrough,
+      children: [
+        Positioned.fill(
+          child: IgnorePointer(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Colors.white.withValues(alpha: isError ? 0.02 : 0.055),
+                    Colors.white.withValues(alpha: 0),
+                  ],
+                  stops: const [0, 0.7],
+                ),
+              ),
+            ),
+          ),
+        ),
+        childWidget,
+      ],
+    );
+
     final button = skipTraversal
         ? _SkipTraversalScope(
             builder: (focusNode) =>
@@ -319,9 +353,42 @@ class CommonCard extends StatelessWidget {
           );
 
     return switch (enterAnimated) {
-      true => FadeScaleEnterBox(child: card),
+      true => FadeScaleEnterBox(child: _HoverLift(child: card)),
       false => card,
     };
+  }
+}
+
+/// Lifts a grid card a hair while the pointer is over it. Only the animated
+/// (grid) cards use it, so dense list rows never overlap their neighbours.
+class _HoverLift extends StatefulWidget {
+  const _HoverLift({required this.child});
+
+  final Widget child;
+
+  @override
+  State<_HoverLift> createState() => _HoverLiftState();
+}
+
+class _HoverLiftState extends State<_HoverLift> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    if (context.disableAnimations) {
+      return widget.child;
+    }
+    return MouseRegion(
+      opaque: false,
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: AnimatedScale(
+        scale: _hovered ? 1.018 : 1,
+        duration: const Duration(milliseconds: 190),
+        curve: Curves.easeOutCubic,
+        child: widget.child,
+      ),
+    );
   }
 }
 

@@ -17,6 +17,13 @@ A multi-platform proxy client based on ClashMeta. Simple to use, open source and
 
 </div>
 
+> [!NOTE]
+> **This is a personal customised build.** It adds a frosted-glass window,
+> ambient aurora backdrop, selectable skins and a redesigned icon set on top of
+> upstream. The upstream auto-updater is switched off, because installing the
+> stock release would overwrite all of it.
+> 本仓库是个人定制构建，改动清单见 **[CUSTOMIZATIONS.md](CUSTOMIZATIONS.md)**。
+
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="snapshots/preview-dark.png">

@@ -53,11 +53,18 @@ void main() {
       isFalse,
       reason: 'an animation here repaints the whole window on every vsync',
     );
+    // The trace is a glowing stroke now: hazed passes underneath, then the
+    // crisp top one, which is shaded rather than a flat colour.
     expect(
       tester.renderObject(_canvas),
       paints
         ..path(style: PaintingStyle.fill)
-        ..path(color: _color, style: PaintingStyle.stroke),
+        ..something(
+          (method, arguments) =>
+              method == #drawPath &&
+              (arguments[1] as Paint).style == PaintingStyle.stroke &&
+              (arguments[1] as Paint).shader != null,
+        ),
     );
   });
 

@@ -777,5 +777,11 @@
   "large": "Крупный",
   "extraLarge": "Очень крупный",
   "switchProfile": "Сменить профиль",
-  "lastUpdated": "Последнее обновление"
+  "lastUpdated": "Последнее обновление",
+  "skins": "Скины",
+  "beautification": "Оформление",
+  "beautificationDesc": "Темы, анимация и значок",
+  "beautificationLink": "Bilibili",
+  "customBuildNotice": "Сборка с оформлением · проверка обновлений отключена",
+  "windowTransparency": "Прозрачность окна"
 }

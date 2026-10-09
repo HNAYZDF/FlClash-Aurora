@@ -777,5 +777,11 @@
   "large": "大",
   "extraLarge": "特大",
   "switchProfile": "プロファイルを切り替え",
-  "lastUpdated": "最終更新"
+  "lastUpdated": "最終更新",
+  "skins": "スキン",
+  "beautification": "デザイン",
+  "beautificationDesc": "スキン、モーション、アイコン",
+  "beautificationLink": "Bilibili",
+  "customBuildNotice": "カスタムビルド · 上流の更新チェックは無効です",
+  "windowTransparency": "ウィンドウの透明度"
 }

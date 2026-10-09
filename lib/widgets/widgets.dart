@@ -1,4 +1,5 @@
 export 'activate_box.dart';
+export 'aurora_backdrop.dart';
 export 'motion_grid.dart';
 export 'active_polling.dart';
 export 'animated_visibility.dart';

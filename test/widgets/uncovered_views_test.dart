@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
@@ -218,7 +217,7 @@ void main() {
     expect(tester.takeException(), null);
   });
 
-  testWidgets('about view shows progress while checking for updates', (
+  testWidgets('about view offers no upstream update check in a custom build', (
     tester,
   ) async {
     final container = _containerFor(tester);
@@ -234,31 +233,14 @@ void main() {
       ),
     );
     await tester.pump();
+
+    // This build carries local customisations, so the updater is switched off:
+    // the page must explain that rather than offer the stock release, which
+    // would silently replace the theme.
+    expect(find.text('Check for updates'), findsNothing);
+    expect(find.textContaining('Custom build'), findsOneWidget);
     expect(find.byType(LinearProgressIndicator), findsNothing);
-
-    await tester.tap(find.text('Check for updates'));
-    await tester.pump();
-    expect(find.byType(LinearProgressIndicator), findsOneWidget);
-
-    await tester.tap(find.text('Check for updates'));
-    await tester.pump(const Duration(milliseconds: 100));
-    expect(adapter.requests, 1);
-
-    adapter.response.complete(
-      ResponseBody.fromString(
-        jsonEncode({'tag_name': 'v0.0.0'}),
-        200,
-        headers: {
-          Headers.contentTypeHeader: [Headers.jsonContentType],
-        },
-      ),
-    );
-    await tester.pump();
-    await tester.pump(const Duration(seconds: 1));
-    await tester.pumpAndSettle();
-
-    expect(find.byType(LinearProgressIndicator), findsNothing);
-    expect(find.text('The app is already up to date'), findsOneWidget);
+    expect(adapter.requests, 0);
     expect(tester.takeException(), null);
   });
 

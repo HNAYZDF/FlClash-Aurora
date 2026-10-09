@@ -140,7 +140,48 @@ const proxiesListStoreKey = PageStorageKey<String>('proxies_list');
 const toolsStoreKey = PageStorageKey<String>('tools');
 const profilesStoreKey = PageStorageKey<String>('profiles');
 
-const defaultPrimaryColor = 0XFFD8C0C3;
+/// Marks a build that carries local customisations on top of upstream.
+///
+/// It switches the upstream updater off: this build reports the upstream
+/// version number, so the checker would offer the official release, and
+/// installing it would silently replace the theme, the icons and the credits.
+/// Update by rebuilding from this source tree instead.
+const customBuild = true;
+
+/// How see-through the window starts, from 0 (opaque) to 1 (mostly glass).
+/// Only takes effect while the desktop blur effect is running.
+const defaultWindowTransparency = 0.55;
+
+/// The most transparent the window may go. `1` leaves nothing of the app's own
+/// background: only the widgets are painted, over the frosted desktop.
+const maxWindowTransparency = 1.0;
+
+/// The sliders work in whole percent from 1 to 100, so the control always reads
+/// as a percentage and never lands on a window that is not there at all.
+const minWindowTransparencyPercent = 1.0;
+const maxWindowTransparencyPercent = 100.0;
+
+double windowTransparencyPercent(double stored) {
+  final clamped = stored.clamp(0.0, maxWindowTransparency);
+  return minWindowTransparencyPercent +
+      (clamped / maxWindowTransparency) *
+          (maxWindowTransparencyPercent - minWindowTransparencyPercent);
+}
+
+double windowTransparencyFromPercent(double percent) {
+  final clamped = percent.clamp(
+    minWindowTransparencyPercent,
+    maxWindowTransparencyPercent,
+  );
+  return (clamped - minWindowTransparencyPercent) /
+      (maxWindowTransparencyPercent - minWindowTransparencyPercent) *
+      maxWindowTransparency;
+}
+
+/// A vivid violet rather than a muted neutral: the ambient backdrop, the glow
+/// behind active controls and every container tone are derived from this seed,
+/// so a saturated one is what makes the app read as colourful out of the box.
+const defaultPrimaryColor = 0XFF7C4DFF;
 
 const maxLogsLength = 5000;
 const maxRequestsLength = 2000;
@@ -152,13 +193,14 @@ const pausedMaxDnsQueriesLength = maxDnsQueriesLength * 2;
 const trafficSampleLength = 30;
 
 const defaultPrimaryColors = [
-  0xFF795548,
+  0xFF7C4DFF,
+  0xFF00E5FF,
+  0xFFFF2D78,
+  0xFF00E676,
+  0xFFFFB300,
+  0xFF536DFE,
   0xFF03A9F4,
-  0xFFFFFF00,
-  0XFFBBC9CC,
-  0XFFABD397,
   defaultPrimaryColor,
-  0XFF665390,
 ];
 
 const scriptTemplate = '''

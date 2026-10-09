@@ -80,8 +80,10 @@ class _HomeShell extends ConsumerWidget {
     final isDashboard = ref.watch(
       currentPageLabelProvider.select((label) => label == PageLabel.dashboard),
     );
+    // Transparent on purpose: the ambient aurora backdrop sits behind the
+    // whole window, and an opaque shell would hide it.
     return Material(
-      color: context.colorScheme.surface,
+      color: Colors.transparent,
       child: Column(
         children: [
           Expanded(
@@ -418,6 +420,8 @@ class _FadeTabPage extends StatelessWidget {
       animation: controller,
       builder: (_, child) {
         final delta = enabled ? _delta : 0.0;
+        // Deliberately a flat cross-fade: the page cancels the pager's slide so
+        // a switch never moves content sideways, which the tests pin down.
         return FractionalTranslation(
           translation: Offset(-delta, 0),
           child: Opacity(opacity: 1 - delta.abs(), child: child),

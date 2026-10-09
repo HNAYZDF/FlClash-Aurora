@@ -295,6 +295,11 @@ class MessageLookup extends MessageLookupByLibrary {
     "batteryOptimizationStatusTip": MessageLookupByLibrary.simpleMessage(
       "Due to system limitations, the battery optimization status cannot be read correctly while running",
     ),
+    "beautification": MessageLookupByLibrary.simpleMessage("Beautification"),
+    "beautificationDesc": MessageLookupByLibrary.simpleMessage(
+      "Skins, motion and app icon",
+    ),
+    "beautificationLink": MessageLookupByLibrary.simpleMessage("Bilibili"),
     "behavior": MessageLookupByLibrary.simpleMessage("Behavior"),
     "bind": MessageLookupByLibrary.simpleMessage("Bind"),
     "blacklistMode": MessageLookupByLibrary.simpleMessage("Blacklist mode"),
@@ -415,6 +420,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "createProfileFromUrlTip": m3,
     "creationTime": MessageLookupByLibrary.simpleMessage("Creation time"),
     "custom": MessageLookupByLibrary.simpleMessage("Custom"),
+    "customBuildNotice": MessageLookupByLibrary.simpleMessage(
+      "Custom build · upstream updates are off so the theme is not replaced",
+    ),
     "customProxiesEmpty": MessageLookupByLibrary.simpleMessage(
       "No custom proxies, so the profile\'s own proxies are used",
     ),
@@ -732,9 +740,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "inputRuleContent": MessageLookupByLibrary.simpleMessage(
       "Enter the rule content",
     ),
-    "installedAppsPermissionDeniedMessage": MessageLookupByLibrary.simpleMessage(
-      "The app list permission was denied, so installed apps cannot be listed. Please grant it manually in system settings.",
-    ),
+    "installedAppsPermissionDeniedMessage":
+        MessageLookupByLibrary.simpleMessage(
+          "The app list permission was denied, so installed apps cannot be listed. Please grant it manually in system settings.",
+        ),
     "installedAppsPermissionDesc": MessageLookupByLibrary.simpleMessage(
       "This system hides the installed app list until the permission is granted. Authorize it to configure the per-app proxy.",
     ),
@@ -1374,6 +1383,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "singleAdd": MessageLookupByLibrary.simpleMessage("Single add"),
     "singleValueTip": m51,
     "size": MessageLookupByLibrary.simpleMessage("Size"),
+    "skins": MessageLookupByLibrary.simpleMessage("Skins"),
     "slide": MessageLookupByLibrary.simpleMessage("Slide"),
     "socksPort": MessageLookupByLibrary.simpleMessage("SOCKS port"),
     "sort": MessageLookupByLibrary.simpleMessage("Sort"),
@@ -1495,6 +1505,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "WebDAV configuration",
     ),
     "whitelistMode": MessageLookupByLibrary.simpleMessage("Whitelist mode"),
+    "windowTransparency": MessageLookupByLibrary.simpleMessage(
+      "Window transparency",
+    ),
     "writeToSystem": MessageLookupByLibrary.simpleMessage("Write to system"),
     "writeToSystemDesc": MessageLookupByLibrary.simpleMessage(
       "Also set the system clock; Android ignores it",

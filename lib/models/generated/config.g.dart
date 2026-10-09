@@ -353,6 +353,9 @@ _ThemeProps _$ThemePropsFromJson(Map<String, dynamic> json) => _ThemeProps(
       DynamicSchemeVariant.content,
   pureBlack: json['pureBlack'] as bool? ?? false,
   sidebarBlur: json['sidebarBlur'] as bool? ?? true,
+  windowTransparency:
+      (json['windowTransparency'] as num?)?.toDouble() ??
+      defaultWindowTransparency,
   textScale: json['textScale'] == null
       ? const TextScale()
       : TextScale.fromJson(json['textScale'] as Map<String, dynamic>),
@@ -366,6 +369,7 @@ Map<String, dynamic> _$ThemePropsToJson(_ThemeProps instance) =>
       'schemeVariant': _$DynamicSchemeVariantEnumMap[instance.schemeVariant]!,
       'pureBlack': instance.pureBlack,
       'sidebarBlur': instance.sidebarBlur,
+      'windowTransparency': instance.windowTransparency,
       'textScale': instance.textScale,
     };
 

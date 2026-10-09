@@ -22,7 +22,17 @@ void main() {
     });
 
     test('Flutter build environment does not depend on Core SHA256', () {
-      expect(setup.createBuildEnvironment('dev'), {'APP_ENV': 'dev'});
+      final environment = setup.createBuildEnvironment('dev');
+
+      expect(environment['APP_ENV'], 'dev');
+      // The frosted window is a compile-time switch, so it has to travel with
+      // the environment for `flutter build` to see it.
+      expect(environment['FEATURE_SIDEBAR_BLUR'], 'true');
+      expect(
+        environment.keys.where((key) => key.toUpperCase().contains('SHA')),
+        isEmpty,
+        reason: 'the core hash is baked in when the core is fetched',
+      );
     });
 
     test('omits verbose from flutter build args by default', () {

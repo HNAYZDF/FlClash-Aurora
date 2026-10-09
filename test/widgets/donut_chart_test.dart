@@ -51,10 +51,13 @@ void main() {
   ) async {
     await tester.pumpWidget(_chart(3, 97));
 
+    // Every segment is drawn twice: a blurred halo, then the crisp arc.
     expect(
       _painter(tester),
       paints
+        ..arc(color: _up.withValues(alpha: 0.45))
         ..arc(color: _up, strokeCap: StrokeCap.round)
+        ..arc(color: _down.withValues(alpha: 0.45))
         ..arc(color: _down, strokeCap: StrokeCap.round),
     );
     expect(_painter(tester), isNot(paints..circle()));

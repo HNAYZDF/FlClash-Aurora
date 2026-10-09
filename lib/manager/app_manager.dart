@@ -8,6 +8,7 @@ import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/state.dart';
 import 'package:fl_clash/widgets/animated_visibility.dart';
+import 'package:fl_clash/widgets/aurora_backdrop.dart';
 import 'package:fl_clash/widgets/icon.dart';
 import 'package:fl_clash/widgets/sidebar.dart';
 import 'package:flutter/foundation.dart';
@@ -245,8 +246,11 @@ class AppSidebarContainer extends ConsumerWidget {
 
     final hasSidebar = viewMode != ViewMode.mobile;
     final isLtr = Directionality.of(context) == TextDirection.ltr;
-    return Container(
-      color: blur ? Colors.transparent : surfaceContainer,
+    // The aurora is the window's backdrop, so every surface above it is either
+    // translucent or transparent on purpose. `blur` is the window's own blur
+    // effect having actually taken hold, which is what the translucency is for.
+    return AuroraBackdrop(
+      frosted: blur,
       child: Row(
         children: [
           AnimatedVisibility.sidebar(
@@ -254,7 +258,7 @@ class AppSidebarContainer extends ConsumerWidget {
             child: _buildBackground(
               color: blur
                   ? surfaceContainer.withValues(alpha: kSidebarBlurOpacity)
-                  : surfaceContainer,
+                  : surfaceContainer.withValues(alpha: 0.70),
               edge: colorScheme.outlineVariant,
               child: MediaQuery.removePadding(
                 context: context,

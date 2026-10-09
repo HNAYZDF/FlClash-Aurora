@@ -148,7 +148,26 @@ class _DonutChartPainter extends CustomPainter {
   final Paint _arcPaint = Paint()
     ..style = PaintingStyle.stroke
     ..strokeCap = StrokeCap.round;
+  final Paint _glowPaint = Paint()
+    ..style = PaintingStyle.stroke
+    ..strokeCap = StrokeCap.round;
   final Paint _dotPaint = Paint();
+  final Paint _dotGlowPaint = Paint();
+
+  void _drawGlowArc(
+    Canvas canvas,
+    Rect rect,
+    double start,
+    double sweep,
+    double width,
+    Color color,
+  ) {
+    _glowPaint
+      ..color = color.withValues(alpha: 0.45)
+      ..strokeWidth = width * 2.1
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6);
+    canvas.drawArc(rect, start, sweep, false, _glowPaint);
+  }
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -190,17 +209,30 @@ class _DonutChartPainter extends CustomPainter {
       start += weight * slot / 2;
       if (weight > 0) {
         if (sweep > _minSweep) {
+          _drawGlowArc(
+            canvas,
+            rect,
+            start,
+            sweep,
+            strokeWidth * weight,
+            colors[i],
+          );
           _arcPaint
             ..color = colors[i]
             ..strokeWidth = strokeWidth * weight;
           canvas.drawArc(rect, start, sweep, false, _arcPaint);
         } else {
-          _dotPaint.color = colors[i];
+          final dotCenter = center + Offset(cos(start), sin(start)) * radius;
+          _dotGlowPaint
+            ..color = colors[i].withValues(alpha: 0.5)
+            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 5);
           canvas.drawCircle(
-            center + Offset(cos(start), sin(start)) * radius,
-            strokeWidth * weight / 2,
-            _dotPaint,
+            dotCenter,
+            strokeWidth * weight * 1.4,
+            _dotGlowPaint,
           );
+          _dotPaint.color = colors[i];
+          canvas.drawCircle(dotCenter, strokeWidth * weight / 2, _dotPaint);
         }
       }
       start += sweep + weight * slot / 2;

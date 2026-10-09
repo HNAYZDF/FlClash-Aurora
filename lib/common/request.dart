@@ -69,6 +69,10 @@ class Request {
   }
 
   Future<Map<String, dynamic>?> checkForUpdate() async {
+    // A customised build has no upstream release to move to: the only newer
+    // thing GitHub can offer is the stock app, which would overwrite the
+    // customisations. Stay silent rather than prompt for that.
+    if (customBuild) return null;
     try {
       final response = await dio.get(
         'https://api.github.com/repos/$repository/releases/latest',

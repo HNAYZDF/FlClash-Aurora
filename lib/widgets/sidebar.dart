@@ -19,7 +19,7 @@ const _indicatorWidth = 3.0;
 const _indicatorHeight = 16.0;
 const _expandDuration = Duration(milliseconds: 250);
 const _indicatorDuration = Duration(milliseconds: 320);
-final _itemShape = AppShape.all(10);
+final _itemShape = AppShape.all(14);
 
 class SidebarDestination {
   const SidebarDestination({required this.glyph, required this.label});
@@ -225,6 +225,10 @@ class _SidebarOverlay extends StatelessWidget {
 class _SidebarColors {
   _SidebarColors(ColorScheme scheme)
     : selectedFill = scheme.onSurface.withValues(alpha: 0.08),
+      selectedFrom = scheme.primary.withValues(alpha: 0.34),
+      selectedTo = scheme.primary.withValues(alpha: 0.06),
+      selectedIcon = scheme.primary,
+      glow = scheme.primary.withValues(alpha: 0.50),
       label = scheme.onSurface,
       icon = scheme.onSurfaceVariant,
       indicator = scheme.primary,
@@ -236,6 +240,17 @@ class _SidebarColors {
       });
 
   final Color selectedFill;
+
+  /// The selected row is filled with a gradient rather than a flat tint, so the
+  /// active destination reads as lit from the leading edge.
+  final Color selectedFrom;
+  final Color selectedTo;
+
+  /// The glyph of the selected row takes the accent instead of a neutral grey.
+  final Color selectedIcon;
+
+  final Color glow;
+
   final Color label;
   final Color icon;
   final Color indicator;
@@ -388,21 +403,46 @@ class _SidebarButton extends StatelessWidget {
         container: true,
         button: true,
         selected: selected,
-        child: Material(
-          color: selected == true ? colors.selectedFill : Colors.transparent,
-          shape: _itemShape,
-          child: InkWell(
-            onTap: onTap,
-            customBorder: _itemShape,
-            mouseCursor: SystemMouseCursors.basic,
-            splashFactory: NoSplash.splashFactory,
-            overlayColor: colors.overlay,
-            child: Tooltip(
-              message: tooltip,
-              excludeFromSemantics: !tooltipIsLabel,
-              child: IconTheme.merge(
-                data: IconThemeData(size: _iconSize, color: colors.icon),
-                child: SizedBox(height: height, child: child),
+        child: DecoratedBox(
+          decoration: ShapeDecoration(
+            shape: _itemShape,
+            gradient: selected == true
+                ? LinearGradient(
+                    begin: AlignmentDirectional.centerStart,
+                    end: AlignmentDirectional.centerEnd,
+                    colors: [colors.selectedFrom, colors.selectedTo],
+                  )
+                : null,
+            color: selected == true ? null : Colors.transparent,
+            shadows: selected == true
+                ? [
+                    BoxShadow(
+                      color: colors.glow,
+                      blurRadius: 18,
+                      spreadRadius: -3,
+                    ),
+                  ]
+                : null,
+          ),
+          child: Material(
+            color: Colors.transparent,
+            shape: _itemShape,
+            child: InkWell(
+              onTap: onTap,
+              customBorder: _itemShape,
+              mouseCursor: SystemMouseCursors.basic,
+              splashFactory: NoSplash.splashFactory,
+              overlayColor: colors.overlay,
+              child: Tooltip(
+                message: tooltip,
+                excludeFromSemantics: !tooltipIsLabel,
+                child: IconTheme.merge(
+                  data: IconThemeData(
+                    size: _iconSize,
+                    color: selected == true ? colors.selectedIcon : colors.icon,
+                  ),
+                  child: SizedBox(height: height, child: child),
+                ),
               ),
             ),
           ),
@@ -556,6 +596,13 @@ class _SelectionIndicatorState extends State<_SelectionIndicator>
           decoration: ShapeDecoration(
             color: widget.color,
             shape: AppShape.full,
+            shadows: [
+              BoxShadow(
+                color: widget.color.withValues(alpha: 0.7),
+                blurRadius: 14,
+                spreadRadius: 1,
+              ),
+            ],
           ),
         ),
       ),

@@ -2,6 +2,7 @@ import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/icons/icons.dart';
 import 'package:fl_clash/models/models.dart';
+import 'package:fl_clash/providers/app.dart';
 import 'package:fl_clash/providers/config.dart';
 import 'package:fl_clash/providers/state.dart';
 import 'package:fl_clash/views/theme_preview.dart';
@@ -28,6 +29,14 @@ class ThemeView extends StatelessWidget {
       body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(child: SizedBox(height: context.appBarInset)),
+          // How far the desktop shows through leads the page, then the skin
+          // that colours whatever shows through it.
+          const _WindowTransparencyItem(),
+          const SliverToBoxAdapter(child: SizedBox(height: 16)),
+          // Skins come next: they are the headline choice, and the live preview
+          // below is tall enough to push anything after it off screen.
+          const _SkinItem(),
+          const SliverToBoxAdapter(child: SizedBox(height: 16)),
           const SliverToBoxAdapter(child: ThemeLivePreview()),
           const SliverToBoxAdapter(child: SizedBox(height: 16)),
           const _ThemeModeItem(),
@@ -71,6 +80,175 @@ class ItemCard extends StatelessWidget {
         InfoHeader(info: info, actions: actions, space: space),
         child,
       ],
+    );
+  }
+}
+
+/// Slider for how far the desktop shows through the window.
+///
+/// It only means anything while the window's blur effect is running, so the
+/// slider is disabled otherwise rather than pretending to do something.
+class _WindowTransparencyItem extends ConsumerStatefulWidget {
+  const _WindowTransparencyItem();
+
+  @override
+  ConsumerState<_WindowTransparencyItem> createState() =>
+      _WindowTransparencyItemState();
+}
+
+class _WindowTransparencyItemState
+    extends ConsumerState<_WindowTransparencyItem> {
+  double? _draft;
+
+  @override
+  Widget build(BuildContext context) {
+    final appLocalizations = context.appLocalizations;
+    final colorScheme = context.colorScheme;
+    final stored = ref.watch(
+      themeSettingProvider.select((state) => state.windowTransparency),
+    );
+    final frosted = ref.watch(windowBlurProvider);
+    final percent = windowTransparencyPercent(_draft ?? stored);
+    return SliverToBoxAdapter(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          InfoHeader(
+            info: Info(
+              label: appLocalizations.windowTransparency,
+              glyph: AppGlyphs.blur,
+            ),
+            actions: [
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
+                decoration: ShapeDecoration(
+                  color: frosted
+                      ? colorScheme.secondaryContainer
+                      : colorScheme.surfaceContainerHighest,
+                  shape: AppShape.full,
+                ),
+                child: Text(
+                  '${percent.round()}%',
+                  style: context.textTheme.labelLarge?.copyWith(
+                    color: frosted
+                        ? colorScheme.onSecondaryContainer
+                        : colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              decoration: ShapeDecoration(
+                color: colorScheme.surfaceContainerLow,
+                shape: AppShape.lg,
+              ),
+              child: Slider(
+                value: percent,
+                min: minWindowTransparencyPercent,
+                max: maxWindowTransparencyPercent,
+                divisions:
+                    (maxWindowTransparencyPercent -
+                            minWindowTransparencyPercent)
+                        .round(),
+                label: '${percent.round()}%',
+                // The draft keeps a drag from writing the config on every frame;
+                // only letting go persists it.
+                onChanged: frosted
+                    ? (next) => setState(
+                        () => _draft = windowTransparencyFromPercent(next),
+                      )
+                    : null,
+                onChangeEnd: frosted
+                    ? (next) {
+                        setState(() => _draft = null);
+                        ref
+                            .read(themeSettingProvider.notifier)
+                            .update(
+                              (state) => state.copyWith(
+                                windowTransparency:
+                                    windowTransparencyFromPercent(next),
+                              ),
+                            );
+                      }
+                    : null,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Picks a whole curated look at once: accent, scheme variant and pure black.
+///
+/// The persisted settings already describe exactly those three, so a skin needs
+/// no field of its own, and the current choice is read back by matching them.
+class _SkinItem extends ConsumerWidget {
+  const _SkinItem();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final appLocalizations = context.appLocalizations;
+    final floatingBar = ref.watch(_floatingBarProvider);
+    final brightness = Theme.of(context).brightness;
+    final current = ref.watch(
+      themeSettingProvider.select(
+        (state) => (
+          primaryColor: state.primaryColor,
+          schemeVariant: state.schemeVariant,
+          pureBlack: state.pureBlack,
+        ),
+      ),
+    );
+    final selected = appSkins
+        .where(
+          (skin) => skin.matches(
+            primaryColor: current.primaryColor,
+            variant: current.schemeVariant,
+            pureBlack: current.pureBlack,
+          ),
+        )
+        .firstOrNull;
+    return SliverToBoxAdapter(
+      child: PreviewChoiceGroup<AppSkin?>(
+        info: Info(label: appLocalizations.skins, glyph: AppGlyphs.paintbrush),
+        value: selected,
+        choices: [
+          for (final skin in appSkins)
+            PreviewChoice<AppSkin?>(
+              value: skin,
+              label: skin.name,
+              pictogram: MiniScreenThumb(
+                screen: MiniScreen(
+                  colorScheme: skin.schemeFor(brightness),
+                  floatingBar: floatingBar,
+                ),
+              ),
+            ),
+        ],
+        onChanged: (skin) {
+          if (skin == null) {
+            return;
+          }
+          ref
+              .read(themeSettingProvider.notifier)
+              .update(
+                (state) => state.copyWith(
+                  primaryColor: skin.seed.toARGB32(),
+                  schemeVariant: skin.variant,
+                  pureBlack: skin.pureBlack,
+                ),
+              );
+        },
+      ),
     );
   }
 }

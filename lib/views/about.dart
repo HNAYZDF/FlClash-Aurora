@@ -18,6 +18,17 @@ class Contributor {
   const Contributor({required this.avatar, required this.name});
 }
 
+/// Credits for the look of this build.
+///
+/// The UID was resolved from Bilibili's user search for the handle, which
+/// returned this account with the exact name.
+const beautificationHandle = 'hnayzdf';
+const beautificationUid = '431149392';
+const beautificationUrl = 'https://space.bilibili.com/$beautificationUid';
+
+/// Bilibili's brand pink, used for the credit badge.
+const _bilibiliPink = Color(0xFFFB7299);
+
 class AboutView extends ConsumerWidget {
   const AboutView({super.key});
 
@@ -25,17 +36,6 @@ class AboutView extends ConsumerWidget {
     Contributor(avatar: 'assets/images/avatar/june2.jpg', name: 'June2'),
     Contributor(avatar: 'assets/images/avatar/arue.jpg', name: 'Arue'),
   ];
-
-  Future<void> _checkUpdate(BuildContext context, WidgetRef ref) async {
-    if (ref.read(loadingProvider(LoadingTag.checkUpdate))) return;
-    final commonAction = ref.read(commonActionProvider.notifier);
-    final data = await globalState.loadingRun<Map<String, dynamic>?>(
-      request.checkForUpdate,
-      title: context.appLocalizations.checkUpdate,
-      tag: LoadingTag.checkUpdate,
-    );
-    unawaited(commonAction.checkUpdateResultHandle(data: data, isUser: true));
-  }
 
   Widget _buildLinkItem({
     required Glyph glyph,
@@ -57,9 +57,7 @@ class AboutView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final appLocalizations = context.appLocalizations;
-    final isLoading = ref.watch(loadingProvider(LoadingTag.checkUpdate));
     return CommonScaffold(
-      isLoading: isLoading,
       title: appLocalizations.about,
       body: ListView(
         padding: const EdgeInsets.symmetric(
@@ -67,10 +65,6 @@ class AboutView extends ConsumerWidget {
         ).copyWith(top: context.contentTopPadding, bottom: 32),
         children: [
           _AboutHero(
-            isCheckingUpdate: isLoading,
-            onCheckUpdate: () {
-              _checkUpdate(context, ref);
-            },
             onEnterDeveloperMode: () {
               ref
                   .read(appSettingProvider.notifier)
@@ -106,6 +100,20 @@ class AboutView extends ConsumerWidget {
             ],
           ),
           generateSectionV3(
+            title: appLocalizations.beautification,
+            items: [
+              ListItem(
+                leading: const _BeautificationBadge(),
+                title: const Text(beautificationHandle),
+                subtitle: Text(appLocalizations.beautificationDesc),
+                trailing: const GlyphIcon(AppGlyphs.openExternal),
+                onTap: () {
+                  dialogs.openUrl(beautificationUrl);
+                },
+              ),
+            ],
+          ),
+          generateSectionV3(
             title: appLocalizations.otherContributors,
             items: [
               for (final contributor in _contributors)
@@ -125,15 +133,9 @@ class AboutView extends ConsumerWidget {
 }
 
 class _AboutHero extends StatelessWidget {
-  final bool isCheckingUpdate;
-  final VoidCallback onCheckUpdate;
   final VoidCallback onEnterDeveloperMode;
 
-  const _AboutHero({
-    required this.isCheckingUpdate,
-    required this.onCheckUpdate,
-    required this.onEnterDeveloperMode,
-  });
+  const _AboutHero({required this.onEnterDeveloperMode});
 
   static const _logoSize = 96.0;
   static const _logoInset = 14.0;
@@ -187,6 +189,15 @@ class _AboutHero extends StatelessWidget {
                 color: colorScheme.surfaceContainerHighest,
                 foregroundColor: colorScheme.onSurfaceVariant,
               ),
+              _Pill(
+                label:
+                    '${appLocalizations.beautificationLink} · $beautificationHandle',
+                color: _bilibiliPink.withValues(alpha: 0.18),
+                foregroundColor: _bilibiliPink,
+                onTap: () {
+                  dialogs.openUrl(beautificationUrl);
+                },
+              ),
             ],
           ),
           const SizedBox(height: 16),
@@ -202,10 +213,25 @@ class _AboutHero extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
-          FilledButton.tonalIcon(
-            onPressed: isCheckingUpdate ? null : onCheckUpdate,
-            icon: const GlyphIcon(AppGlyphs.sync, fill: 1),
-            label: Text(appLocalizations.checkUpdate),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              GlyphIcon(
+                AppGlyphs.info,
+                size: 16,
+                color: colorScheme.onSurfaceVariant,
+              ),
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  appLocalizations.customBuildNotice,
+                  style: textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -217,16 +243,18 @@ class _Pill extends StatelessWidget {
   final String label;
   final Color color;
   final Color foregroundColor;
+  final VoidCallback? onTap;
 
   const _Pill({
     required this.label,
     required this.color,
     required this.foregroundColor,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
+    final pill = DecoratedBox(
       decoration: ShapeDecoration(color: color, shape: AppShape.full),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -236,6 +264,52 @@ class _Pill extends StatelessWidget {
             color: foregroundColor,
             fontWeight: FontWeight.w600,
           ),
+        ),
+      ),
+    );
+    if (onTap == null) {
+      return pill;
+    }
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(onTap: onTap, child: pill),
+    );
+  }
+}
+
+/// Badge for the beautification credit: Bilibili pink fading into the app's
+/// accent, so it reads as a brand mark rather than another settings row.
+class _BeautificationBadge extends StatelessWidget {
+  const _BeautificationBadge();
+
+  @override
+  Widget build(BuildContext context) {
+    final accent = Theme.of(context).colorScheme.primary;
+    return DecoratedBox(
+      decoration: ShapeDecoration(
+        shape: AppShape.md,
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [_bilibiliPink, Color(0xFF7C4DFF)],
+        ),
+        shadows: [
+          BoxShadow(
+            color: _bilibiliPink.withValues(alpha: 0.45),
+            blurRadius: 14,
+            spreadRadius: -2,
+          ),
+          BoxShadow(
+            color: accent.withValues(alpha: 0.25),
+            blurRadius: 20,
+            spreadRadius: -6,
+          ),
+        ],
+      ),
+      child: const SizedBox.square(
+        dimension: 40,
+        child: Center(
+          child: GlyphIcon(AppGlyphs.sparkle, size: 20, color: Colors.white),
         ),
       ),
     );

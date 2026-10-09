@@ -777,5 +777,11 @@
   "large": "Large",
   "extraLarge": "Extra large",
   "switchProfile": "Switch profile",
-  "lastUpdated": "Last updated"
+  "lastUpdated": "Last updated",
+  "skins": "Skins",
+  "beautification": "Beautification",
+  "beautificationDesc": "Skins, motion and app icon",
+  "beautificationLink": "Bilibili",
+  "customBuildNotice": "Custom build · upstream updates are off so the theme is not replaced",
+  "windowTransparency": "Window transparency"
 }
