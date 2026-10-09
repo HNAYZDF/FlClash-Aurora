@@ -2,143 +2,122 @@
 
 <img src="assets/images/icon.png" alt="FlClash" width="88">
 
-# FlClash
+# FlClash Aurora
 
-A multi-platform proxy client based on ClashMeta. Simple to use, open source and ad-free.
+基于 ClashMeta 的多平台代理客户端。**本仓库是个人定制构建**，在上游基础上做了界面美化。
 
-**English** · [简体中文](README_zh_CN.md)
+**简体中文** · [English](README_EN.md)
 
-[![Release](https://img.shields.io/github/v/release/chen08209/FlClash?style=flat-square&label=release)](https://github.com/chen08209/FlClash/releases/latest)
-[![Downloads](https://img.shields.io/github/downloads/chen08209/FlClash/total?style=flat-square&logo=github)](https://github.com/chen08209/FlClash/releases)
-[![License](https://img.shields.io/github/license/chen08209/FlClash?style=flat-square)](LICENSE)
-[![Telegram](https://img.shields.io/badge/Telegram-channel-26A5E4?style=flat-square&logo=telegram&logoColor=white)](https://t.me/FlClash)
+[![Release](https://img.shields.io/github/v/release/HNAYZDF/FlClash-Aurora?style=flat-square&label=release)](https://github.com/HNAYZDF/FlClash-Aurora/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/HNAYZDF/FlClash-Aurora/total?style=flat-square&logo=github)](https://github.com/HNAYZDF/FlClash-Aurora/releases)
+[![License](https://img.shields.io/github/license/HNAYZDF/FlClash-Aurora?style=flat-square)](LICENSE)
 
-[Website](https://chen08209.github.io/FlClash) · [Download](#download) · [Changelog](CHANGELOG.md) · [Build from source](#build-from-source)
+[下载](#下载) · [改动清单](CUSTOMIZATIONS.md) · [从源码构建](#从源码构建) · [上游说明](README_zh_CN.md)
 
 </div>
 
-> [!NOTE]
-> **This is a personal customised build.** It adds a frosted-glass window,
-> ambient aurora backdrop, selectable skins and a redesigned icon set on top of
-> upstream. The upstream auto-updater is switched off, because installing the
-> stock release would overwrite all of it.
-> 本仓库是个人定制构建，改动清单见 **[CUSTOMIZATIONS.md](CUSTOMIZATIONS.md)**。
+> [!IMPORTANT]
+> **这是个人定制构建，不是官方版本。**
+> 上游自动更新已关闭 —— 本构建报告的是上游版本号，更新器会提示安装官方版，
+> 而安装官方版会覆盖下面全部定制。需要更新请从本仓库重新构建。
+
+## 界面预览
 
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="snapshots/preview-dark.png">
-    <img alt="FlClash dashboard on a MacBook and a phone" src="snapshots/preview.png" width="92%">
-  </picture>
+  <img alt="仪表盘：磨砂玻璃窗口、可调透明度、霓虹图表" src="snapshots/aurora/dashboard.jpg" width="92%">
 </p>
 
-## Features
+<p align="center">
+  <img alt="皮肤选择：八套中文皮肤" src="snapshots/aurora/skins.jpg" width="92%">
+</p>
 
-- **One app for Android, Windows, macOS and Linux**, with x64 and ARM64 builds on the desktop.
-- **mihomo (Clash.Meta) core** with rule routing, proxy groups, latency tests, system proxy and TUN mode.
-- **Profiles** from a subscription link or a file, with a built-in editor, override scripts, and custom rules,
-  proxies and proxy groups.
-- **Live views** of connections, requests, DNS queries and logs.
-- **Material You design** with dynamic color, light and dark themes, and layouts that adapt from phones to desktops.
-- **Backup and restore** through WebDAV or a local file.
-- **Platform touches**: a Quick Settings tile, per-app proxy and Android TV support on Android; a tray menu and
-  global hotkeys on the desktop.
-- **Open source and ad-free**, licensed under GPL-3.0.
+## 这个版本有什么不同
 
-## Download
+### 磨砂玻璃窗口
 
-Get the latest build from [GitHub Releases](https://github.com/chen08209/FlClash/releases/latest), or open the
-[website](https://chen08209.github.io/FlClash#download), which picks the right file for your device.
+使用 Windows 原生 acrylic 特效，窗口半透明并**模糊后方桌面**。
+特效未生效时自动退回不透明，不会露出裸窗口底色。
 
-| Platform | Packages | Notes |
+### 透明度 1–100% 可调
+
+仪表盘底部与设置页各有一个滑块。拉到 **100% 时底色、面纱和极光光晕全部归零**，
+只剩控件画在磨砂桌面上。
+
+光晕完全淡出后会自动停掉重绘定时器 —— 否则就是在每帧重绘一张看不见的全屏模糊。
+把透明度拉回一点，动画自动恢复。
+
+### 八套中文皮肤
+
+| 皮肤 | 强调色 | 配色变体 |
 | --- | --- | --- |
-| Android | APK for `arm64-v8a`, `armeabi-v7a` and `x86_64` | Most phones use `arm64-v8a`. Also on the F-Droid repository below. |
-| Windows 10 and later | Installer (`.exe`) or portable `.zip`, for x64 and ARM64 | Pick ARM64 on Snapdragon and other ARM laptops. |
-| macOS 12 and later | DMG for Apple Silicon and Intel | Also on Homebrew. |
-| Linux | `.deb`, `.rpm` and AppImage, for x64 and ARM64 | See the tray note below. |
+| 极光 | 紫罗兰 | 内容主题 |
+| 深海 | 青色 | 活力 |
+| 霓虹 | 品红 | 高保真 |
+| 翡翠 | 翠绿 | 高保真 |
+| 熔金 | 琥珀 | 活力 |
+| 虹彩 | 靛蓝 | 彩虹 |
+| 极夜 | 紫罗兰 | 内容主题（纯黑） |
+| 石墨 | 蓝灰 | 中性 |
 
-<p>
-  <a href="https://chen08209.github.io/FlClash-fdroid-repo/repo?fingerprint=789D6D32668712EF7672F9E58DEEB15FBD6DCEEC5AE7A4371EA72F2AAE8A12FD"><img alt="Get it on F-Droid" src="snapshots/get-it-on-fdroid.svg" height="56"></a>
-  <a href="https://github.com/chen08209/FlClash/releases/latest"><img alt="Get it on GitHub" src="snapshots/get-it-on-github.svg" height="56"></a>
-</p>
+皮肤只记录「强调色 + 配色变体 + 纯黑」三项 —— 不新增持久化字段，
+因此**能随配置一起备份恢复**，也不会因为降级回官方版而丢失。
 
-**Homebrew**
+> 每个皮肤的配色变体都刻意避开了 `expressive` 与 `fruitSalad`：
+> 这两个变体会把主色相旋转 +240° 和 −50°，会让叫「霓虹」的皮肤渲染成别的颜色。
+> 仓库里有一条测试锁住这个约束。
 
-```bash
-brew tap chen08209/tap
-brew install --cask flclash
-```
+### 其余界面改动
 
-**Linux tray icon**
+- **极光背景** —— 整窗铺一层缓慢漂移的渐变光晕，颜色由当前皮肤推导，强度随配色鲜艳度自动调节
+- **玻璃卡片** —— 半透明填充 + 斜切高光，悬停时轻微上浮
+- **霓虹图表** —— 折线图与环形图带发光描边、三段渐变填充与端点光点
+- **侧边栏** —— 选中项改为渐变胶囊 + 光晕 + 强调色图标
+- **开始按钮** —— 呼吸填充 + 向外扩散的雷达波纹
+- **应用图标** —— 重绘的方圆形图标与四种状态托盘图标
 
-The `.deb` package installs its own dependencies. With the AppImage or the `.rpm`, install the AyatanaAppIndicator
-library so the tray icon can show:
+## 下载
 
-```bash
-sudo apt-get install libayatana-appindicator3-1   # Debian and Ubuntu
-sudo dnf install libayatana-appindicator-gtk3     # Fedora
-```
+到 [Releases](https://github.com/HNAYZDF/FlClash-Aurora/releases/latest) 下载：
 
-## Usage
-
-**Import a profile from a link.** Opening a link in this form imports the subscription into FlClash. The `clashmeta://`
-and `flclash://` schemes work the same way.
-
-```text
-clash://install-config?url=<URL-encoded subscription link>
-```
-
-**Automate on Android.** Tasker, MacroDroid and similar apps can start, stop or toggle the proxy by starting an
-activity with one of these actions:
-
-```text
-com.follow.clash.action.START
-com.follow.clash.action.STOP
-com.follow.clash.action.TOGGLE
-```
-
-From a computer, the same works over adb:
-
-```bash
-adb shell am start -a com.follow.clash.action.TOGGLE
-```
-
-## Build from source
-
-You need [Flutter](https://docs.flutter.dev/get-started/install) 3.47 (release builds use 3.47.4),
-[Go](https://go.dev/dl/) 1.26 and [Rust](https://rustup.rs/) installed through rustup. Each platform builds on its own
-host, except Android, which builds anywhere.
-
-```bash
-git clone --recursive https://github.com/chen08209/FlClash.git
-cd FlClash
-flutter pub get
-dart setup.dart android   # or windows, macos, linux
-```
-
-Packages land in `dist/`. The Go core and the Rust libraries are compiled as part of the Flutter build.
-
-| Platform | Also needed |
+| 文件 | 说明 |
 | --- | --- |
-| Android | Android SDK with the NDK. Add `--arch arm64` to build a single ABI. |
-| Windows | GCC (MinGW-w64) for the core and [Inno Setup](https://jrsoftware.org/isinfo.php) 6 for the installer. |
-| macOS | Xcode and Node.js. The script installs `appdmg` through npm. |
-| Linux | Debian or Ubuntu. The script installs the build packages with apt and downloads `appimagetool`. |
+| `FlClash-*-setup.exe` | 安装包，含开始菜单与卸载程序 |
+| `FlClash-*-windows-amd64.zip` | 便携压缩包，解压即用 |
 
-Run `dart setup.dart --help` for the remaining options, such as `--targets` to build only some package formats.
+> 安装包会先结束正在运行的 FlClash。若系统代理开着，安装期间会有短暂断网，装完启动即恢复。
 
-## Support
+## 从源码构建
 
-Starring the repository is the easiest way to support the project. Questions and announcements go to the
-[Telegram channel](https://t.me/FlClash); bugs and feature requests go to
-[GitHub Issues](https://github.com/chen08209/FlClash/issues).
+```bash
+git clone --recursive https://github.com/HNAYZDF/FlClash-Aurora.git
+cd FlClash-Aurora
+flutter pub get
+flutter build windows --release --dart-define-from-file=env.json
+```
 
-<a href="https://star-history.com/#chen08209/FlClash&Date">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=chen08209/FlClash&type=Date&theme=dark">
-    <img alt="Star history" src="https://api.star-history.com/svg?repos=chen08209/FlClash&type=Date" width="640">
-  </picture>
-</a>
+`env.json` 由 `setup.dart` 生成。**其中 `FEATURE_SIDEBAR_BLUR` 必须为 `true`**，
+否则窗口不会应用磨砂特效，透明度滑块会失效并被禁用：
 
-## License
+```json
+{ "APP_ENV": "stable", "FEATURE_SIDEBAR_BLUR": "true" }
+```
 
-FlClash is released under the [GPL-3.0 license](LICENSE).
+用 `dart setup.dart windows --env stable` 打包时会自动带上这个开关。
+
+## 已知限制
+
+- Win11 上 acrylic 在拖动或缩放窗口时可能有轻微延迟 —— 这是 DWM 对旧版
+  `SetWindowCompositionAttribute` 的固有行为。
+- 设置里的「侧边栏背景模糊」实际控制整个窗口的磨砂开关；关掉它窗口变回不透明，
+  透明度滑块随之禁用。
+- 上游测试中有 6 项在改动前就失败（集中在 `core/event.dart`、`l10n_labels.dart`
+  等本仓库未修改的文件），与本定制无关。
+
+---
+
+## 鸣谢
+
+界面美化：哔哩哔哩 **[hnayzdf](https://space.bilibili.com/431149392)**
+
+本项目基于 [chen08209/FlClash](https://github.com/chen08209/FlClash) 修改，
+遵循 **GPL-3.0** 协议，著作权归 FlClash 全体贡献者所有。完整改动见 [CUSTOMIZATIONS.md](CUSTOMIZATIONS.md)。
