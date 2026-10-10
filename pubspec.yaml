@@ -102,7 +102,14 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/data/
+    # Listed one by one rather than as the whole directory: GEOIP.dat is the
+    # legacy trie the core only reads with `geodata-mode: true`, and the default
+    # `memconservative` loader reads GEOIP.metadb instead. Dropping it takes
+    # 19.6 MB out of the bundle. Put it back by re-adding the line and the entry
+    # in lib/core/controller.dart's geoFileNameList, which must stay in step.
+    - assets/data/GEOIP.metadb
+    - assets/data/GEOSITE.dat
+    - assets/data/ASN.mmdb
     - assets/fonts/
     - assets/images/
     - assets/images/avatar/

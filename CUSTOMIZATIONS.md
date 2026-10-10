@@ -56,12 +56,49 @@ flutter build windows --release --dart-define-from-file=env.json
 **`FEATURE_SIDEBAR_BLUR` 必须为 `true`**，否则窗口不会应用磨砂特效，
 透明度滑块会失效并被禁用。用 `dart setup.dart windows --env stable` 打包时会自动带上。
 
+## 体积与性能
+
+实测数据（Windows x64，release 构建）：
+
+| 项目 | 上游原样 | 本仓库 | 变化 |
+| --- | --- | --- | --- |
+| 安装后占用 | 157.2 MB | **137.6 MB** | −19.6 MB（−12.5%） |
+| 安装包 | 42.69 MB | **40.43 MB** | −2.26 MB（−5.3%） |
+| 便携 zip | 67.80 MB | **62.59 MB** | −5.21 MB（−7.7%） |
+| 空闲 CPU | — | 单核 **1.4%** | 60 秒采样 0.83 秒 |
+| 空闲内存 | — | UI ~135 MB + 内核 ~59 MB | — |
+
+做了两件事：
+
+**不再打包 `GEOIP.dat`（19.6 MB）** —— 那是只在 `geodata-mode: true` 时才会被
+读取的旧版 trie；默认的 `memconservative` 加载器读的是 `GEOIP.metadb`。
+`pubspec.yaml` 因此改为逐个列出地理文件，并同步修改了
+`lib/core/controller.dart` 的 `geoFileNameList` —— **这两处必须一起改**，
+否则 `initGeo()` 会因 `rootBundle.load` 找不到资源而抛异常，导致内核初始化失败。
+
+> 需要旧版 `.dat` 时：在应用内「工具 → Geo 资源 → 更新」即可下载到数据目录，
+> 或者把 `assets/data/GEOIP.dat` 加回 `pubspec.yaml` 与 `geoFileNameList`。
+
+**安装包压缩升到 `lzma2/ultra64`** —— Inno Setup 的最强档，无损。
+
+### 已经到极限的部分
+
+- **Go 内核 69.3 MB**（占安装体积 50%）：`build_config.yaml` 里已经是
+  `go_ldflags: "-w -s"`，PE 里没有 `.debug_*` 节、`.symtab` 只有 512 字节 ——
+  **没有可剥离的调试信息**。剩下的唯一减法是去掉 `with_gvisor` 标签，
+  但那会砍掉 TUN 的 gvisor 栈，属于功能取舍而非优化，故未采用。
+- **`flutter_windows.dll` 20.3 MB**：Flutter 引擎，固定成本。
+- **`app.so` 15.1 MB**：Dart AOT 快照。
+- **地理数据 24.3 MB**：`GEOIP.metadb` / `ASN.mmdb` / `GEOSITE.dat`，运行时必需。
+
 ## 已知限制
 
 - Win11 上 acrylic 在拖动/缩放窗口时可能有轻微延迟，这是 DWM 对旧版
   `SetWindowCompositionAttribute` 的固有行为。
 - 设置里的「侧边栏背景模糊」实际控制整个窗口的磨砂特效开关；关掉它窗口会变回
   不透明，透明度滑块随之禁用。
+- 本仓库的构建**不含 `GEOIP.dat`**。若把 `geodata-mode` 改成 `true`，
+  `GEOIP` 规则会失效，需先在应用内更新 Geo 资源。
 - 上游测试中有 6 项在改动前就失败（集中在 `core/event.dart`、`l10n_labels.dart`
   等本仓库未修改的文件），与本定制无关。
 

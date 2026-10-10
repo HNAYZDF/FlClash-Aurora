@@ -104,12 +104,27 @@ flutter build windows --release --dart-define-from-file=env.json
 
 用 `dart setup.dart windows --env stable` 打包时会自动带上这个开关。
 
+## 体积与性能
+
+| 项目 | 上游原样 | 本版本 |
+| --- | --- | --- |
+| 安装后占用 | 157.2 MB | **137.6 MB** |
+| 安装包 | 42.69 MB | **40.43 MB** |
+| 便携 zip | 67.80 MB | **62.59 MB** |
+| 空闲 CPU | — | 单核 **1.4%** |
+
+不再打包只在 `geodata-mode: true` 时才会读取的旧版 `GEOIP.dat`（19.6 MB），
+安装包压缩升到 Inno Setup 的最强档 `lzma2/ultra64`。
+细节与取舍见 [CUSTOMIZATIONS.md](CUSTOMIZATIONS.md)。
+
 ## 已知限制
 
 - Win11 上 acrylic 在拖动或缩放窗口时可能有轻微延迟 —— 这是 DWM 对旧版
   `SetWindowCompositionAttribute` 的固有行为。
 - 设置里的「侧边栏背景模糊」实际控制整个窗口的磨砂开关；关掉它窗口变回不透明，
   透明度滑块随之禁用。
+- 本版本**不含 `GEOIP.dat`**。若把 `geodata-mode` 改成 `true`，`GEOIP` 规则会失效，
+  需先在应用内「工具 → Geo 资源」更新一次。
 - 上游测试中有 6 项在改动前就失败（集中在 `core/event.dart`、`l10n_labels.dart`
   等本仓库未修改的文件），与本定制无关。
 
