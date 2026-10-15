@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/icons/icons.dart';
 import 'package:fl_clash/providers/providers.dart';
@@ -194,14 +192,11 @@ class _StartButtonState extends ConsumerState<StartButton>
     final appLocalizations = context.appLocalizations;
     final suspended = isStart && suspend;
     if (NavigationDock.isDocked(context)) {
-      return BreathingFill(
-        active: isStart && !suspend,
-        child: FloatingActionButton(
-          heroTag: null,
-          tooltip: suspended ? appLocalizations.suspended : null,
-          onPressed: handleSwitchStart,
-          child: _buildIcon(isStart, suspended: suspended),
-        ),
+      return FloatingActionButton(
+        heroTag: null,
+        tooltip: suspended ? appLocalizations.suspended : null,
+        onPressed: handleSwitchStart,
+        child: _buildIcon(isStart, suspended: suspended),
       );
     }
     final hasThreeDigitHours =
@@ -276,163 +271,4 @@ class _StartButtonState extends ConsumerState<StartButton>
       ),
     );
   }
-}
-
-class BreathingFill extends StatefulWidget {
-  const BreathingFill({super.key, required this.active, required this.child});
-
-  final bool active;
-  final Widget child;
-
-  @override
-  State<BreathingFill> createState() => _BreathingFillState();
-}
-
-class _BreathingFillState extends State<BreathingFill> {
-  static const _breathDuration = Duration(milliseconds: 1400);
-  static const _ringDuration = Duration(milliseconds: 2600);
-  // A ticker would redraw the screen on every vsync for as long as the core runs.
-  static const _breathStep = Duration(milliseconds: 66);
-  static const _fadeDuration = Duration(milliseconds: 300);
-
-  final _breath = ValueNotifier<double>(0);
-
-  /// Monotonic 0..1 sawtooth, so the ripple rings can travel outwards without
-  /// reversing the way the breath value does.
-  final _wave = ValueNotifier<double>(0);
-  late final AppLifecycleListener _lifecycle;
-  Timer? _timer;
-  int _steps = 0;
-  bool _canAnimate = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _lifecycle = AppLifecycleListener(onStateChange: (_) => _sync());
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _canAnimate =
-        !MediaQuery.disableAnimationsOf(context) &&
-        TickerMode.valuesOf(context).enabled;
-    _sync();
-  }
-
-  @override
-  void didUpdateWidget(BreathingFill oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    _sync();
-  }
-
-  bool get _isForeground => switch (WidgetsBinding.instance.lifecycleState) {
-    null || AppLifecycleState.resumed || AppLifecycleState.inactive => true,
-    _ => false,
-  };
-
-  void _sync() {
-    if (!widget.active || !_canAnimate || !_isForeground) {
-      _timer?.cancel();
-      _timer = null;
-      if (widget.active) _breath.value = 1;
-      return;
-    }
-    _timer ??= Timer.periodic(_breathStep, (_) => _step());
-  }
-
-  void _step() {
-    final period = _breathDuration.inMicroseconds / _breathStep.inMicroseconds;
-    final step = ++_steps;
-    final phase = step % (2 * period) / period;
-    _breath.value = Curves.easeInOut.transform(phase <= 1 ? phase : 2 - phase);
-    final ring = _ringDuration.inMicroseconds / _breathStep.inMicroseconds;
-    _wave.value = (step % ring) / ring;
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    _lifecycle.dispose();
-    _breath.dispose();
-    _wave.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Stack(
-      children: [
-        widget.child,
-        Positioned.fill(
-          child: IgnorePointer(
-            child: AnimatedOpacity(
-              opacity: widget.active ? 1 : 0,
-              duration: _fadeDuration,
-              child: RepaintBoundary(
-                child: CustomPaint(
-                  painter: _BreathingFillPainter(
-                    breath: _breath,
-                    wave: _wave,
-                    color: theme.colorScheme.onPrimaryContainer,
-                    shape:
-                        theme.floatingActionButtonTheme.shape ?? AppShape.full,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _BreathingFillPainter extends CustomPainter {
-  _BreathingFillPainter({
-    required this.breath,
-    required this.wave,
-    required this.color,
-    required this.shape,
-  }) : super(repaint: Listenable.merge([breath, wave]));
-
-  final ValueNotifier<double> breath;
-  final ValueNotifier<double> wave;
-  final Color color;
-  final ShapeBorder shape;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final path = shape.getOuterPath(Offset.zero & size);
-    canvas.drawPath(
-      path,
-      Paint()..color = color.withValues(alpha: 0.14 * breath.value),
-    );
-
-    // Rings ripple out from the glyph, so a running core reads as alive. The
-    // origin is the button's leading icon: for the round dock button that is
-    // the centre, and for the pill it is where the glyph sits.
-    canvas
-      ..save()
-      ..clipPath(path);
-    final origin = Offset(size.height / 2, size.height / 2);
-    final reach = size.longestSide;
-    for (var i = 0; i < 3; i++) {
-      final t = (wave.value + i / 3) % 1;
-      canvas.drawCircle(
-        origin,
-        reach * 0.10 + reach * 0.80 * t,
-        Paint()
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 1.6
-          ..color = color.withValues(alpha: (1 - t) * 0.36),
-      );
-    }
-    canvas.restore();
-  }
-
-  @override
-  bool shouldRepaint(_BreathingFillPainter oldDelegate) =>
-      color != oldDelegate.color || shape != oldDelegate.shape;
 }
